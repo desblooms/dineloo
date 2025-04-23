@@ -1,0 +1,9 @@
+{ 
+  "name": "restaurant/food-app", 
+  "description": "Food & Beverage Mobile Web Application", 
+  "type": "project", 
+  "require": { 
+    "php": "^7.4", 
+    "endroid/qr-code": "^4.0" 
+  } 
+} 
