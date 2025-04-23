@@ -4,90 +4,16 @@ RewriteBase /
 RewriteCond %{HTTPS} off
 RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
-# If you have a front controller pattern (all requests go through index.php)
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
-
 # Security Headers
 <IfModule mod_headers.c>
-    # Protection against clickjacking
     Header set X-Frame-Options "SAMEORIGIN"
-    
-    # Protection against XSS attacks
     Header set X-XSS-Protection "1; mode=block"
-    
-    # Disable MIME type sniffing
     Header set X-Content-Type-Options "nosniff"
-    
-    # Referrer Policy
     Header set Referrer-Policy "strict-origin-when-cross-origin"
-    
-    # Content Security Policy - customize based on your needs
-    Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data:; font-src 'self' https://cdnjs.cloudflare.com; connect-src 'self'"
-    
-    # HSTS (HTTP Strict Transport Security) - uncomment after testing
-    # Header set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
 </IfModule>
-
-# Clean URLs for customer-facing pages
-# Menu items
-RewriteRule ^menu/category/([0-9]+)/?$ menu.php?category_id=$1 [QSA,L]
-RewriteRule ^menu/item/([0-9]+)/?$ menu.php?item_id=$1 [QSA,L]
-
-# Order tracking
-RewriteRule ^order/([0-9]+)/?$ orders.php?order_id=$1 [QSA,L]
-RewriteRule ^track/([0-9]+)/?$ orders.php?track_id=$1 [QSA,L]
-
-# User profiles
-RewriteRule ^profile/?$ profile.php [QSA,L]
-RewriteRule ^feedback/([0-9]+)/?$ feedback.php?order_id=$1 [QSA,L]
-
-# Admin panel routes
-RewriteRule ^admin/menu/edit/([0-9]+)/?$ admin/menu-manage.php?edit_id=$1 [QSA,L]
-RewriteRule ^admin/orders/view/([0-9]+)/?$ admin/orders.php?view_id=$1 [QSA,L]
-RewriteRule ^admin/reports/([a-z]+)/?$ admin/reports.php?type=$1 [QSA,L]
-
-# Kitchen panel routes
-RewriteRule ^kitchen/queue/?$ kitchen/orders.php?view=queue [QSA,L]
-
-# Waiter panel routes
-RewriteRule ^waiter/table/([0-9]+)/?$ waiter/tables.php?table_id=$1 [QSA,L]
 
 # Prevent directory listing
 Options -Indexes
-
-# Protect sensitive files
-<FilesMatch "^\.ht|^\.|\.env|\.config|\.sql|\.log|\.json|composer\.json|package\.json">
-    Order allow,deny
-    Deny from all
-</FilesMatch>
-
-# Protect sensitive directories
-<DirectoryMatch "^/(?:php|storage|scripts|database)/">
-    Order allow,deny
-    Deny from all
-</DirectoryMatch>
-
-# Allow access to specific API endpoints
-<FilesMatch "^api/">
-    Order allow,deny
-    Allow from all
-</FilesMatch>
-
-# Restrict access to admin, kitchen, and POS directories based on IP (optional)
-# <DirectoryMatch "^/(admin|kitchen|pos)/">
-#    Order deny,allow
-#    Deny from all
-#    Allow from 127.0.0.1
-#    Allow from ::1
-#    # Add restaurant IP addresses here
-# </DirectoryMatch>
-
-# Error pages
-ErrorDocument 404 /404.php
-ErrorDocument 403 /403.php
-ErrorDocument 500 /500.php
 
 # PHP settings
 <IfModule mod_php7.c>
@@ -100,77 +26,7 @@ ErrorDocument 500 /500.php
     php_flag log_errors on
 </IfModule>
 
-# Caching rules
-<IfModule mod_expires.c>
-    ExpiresActive On
-    
-    # Default expiration: 1 hour
-    ExpiresDefault "access plus 1 hour"
-    
-    # Images
-    ExpiresByType image/jpg "access plus 1 year"
-    ExpiresByType image/jpeg "access plus 1 year"
-    ExpiresByType image/gif "access plus 1 year"
-    ExpiresByType image/png "access plus 1 year"
-    ExpiresByType image/svg+xml "access plus 1 year"
-    ExpiresByType image/webp "access plus 1 year"
-    ExpiresByType image/x-icon "access plus 1 year"
-    ExpiresByType image/ico "access plus 1 year"
-    
-    # CSS, JavaScript
-    ExpiresByType text/css "access plus 1 month"
-    ExpiresByType application/javascript "access plus 1 month"
-    ExpiresByType text/javascript "access plus 1 month"
-    
-    # Fonts
-    ExpiresByType application/font-woff "access plus 1 year"
-    ExpiresByType application/font-woff2 "access plus 1 year"
-    ExpiresByType application/vnd.ms-fontobject "access plus 1 year"
-    ExpiresByType font/ttf "access plus 1 year"
-    ExpiresByType font/otf "access plus 1 year"
-    ExpiresByType font/eot "access plus 1 year"
-</IfModule>
-
 # Enable GZIP compression
 <IfModule mod_deflate.c>
-    # Compress HTML, CSS, JavaScript, Text, XML and fonts
-    AddOutputFilterByType DEFLATE application/javascript
-    AddOutputFilterByType DEFLATE application/rss+xml
-    AddOutputFilterByType DEFLATE application/vnd.ms-fontobject
-    AddOutputFilterByType DEFLATE application/x-font
-    AddOutputFilterByType DEFLATE application/x-font-opentype
-    AddOutputFilterByType DEFLATE application/x-font-otf
-    AddOutputFilterByType DEFLATE application/x-font-truetype
-    AddOutputFilterByType DEFLATE application/x-font-ttf
-    AddOutputFilterByType DEFLATE application/x-javascript
-    AddOutputFilterByType DEFLATE application/xhtml+xml
-    AddOutputFilterByType DEFLATE application/xml
-    AddOutputFilterByType DEFLATE font/opentype
-    AddOutputFilterByType DEFLATE font/otf
-    AddOutputFilterByType DEFLATE font/ttf
-    AddOutputFilterByType DEFLATE image/svg+xml
-    AddOutputFilterByType DEFLATE image/x-icon
-    AddOutputFilterByType DEFLATE text/css
-    AddOutputFilterByType DEFLATE text/html
-    AddOutputFilterByType DEFLATE text/javascript
-    AddOutputFilterByType DEFLATE text/plain
-    AddOutputFilterByType DEFLATE text/xml
-    
-    # Remove browser bugs for older browsers
-    BrowserMatch ^Mozilla/4 gzip-only-text/html
-    BrowserMatch ^Mozilla/4\.0[678] no-gzip
-    BrowserMatch \bMSIE !no-gzip !gzip-only-text/html
-    Header append Vary User-Agent
+    AddOutputFilterByType DEFLATE application/javascript text/css text/html
 </IfModule>
-
-# Prevent access to files without extension (usually PHP processing files)
-<FilesMatch "^(?!\.).+$">
-    Order allow,deny
-    Deny from all
-</FilesMatch>
-
-# Allow access to these exceptions that don't have extensions
-<FilesMatch "^(index|login|menu|cart|orders|profile|feedback)$">
-    Order allow,deny
-    Allow from all
-</FilesMatch>
